@@ -7,7 +7,7 @@ using BidIngressAPI.Models;
 namespace BidIngressAPI.Controllers
 {
     [ApiController]
-    [Route("bid")]
+    [Route("ingress")]
     public class BidIngressController : ControllerBase, IDisposable
     {
         private readonly ILogger<BidIngressController> _logger;
