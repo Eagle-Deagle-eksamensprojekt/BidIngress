@@ -54,18 +54,18 @@ jobs:
     - name: Extract version from .csproj
       id: version
       run: |
-        VERSION=$(cat bidServiceAPI/bidServiceAPI.csproj | grep -oPm1 "(?<=<Version>)[^<]+")
+        VERSION=$(cat bidIngressAPI/bidIngressAPI.csproj | grep -oPm1 "(?<=<Version>)[^<]+")
         echo "VERSION=$VERSION" >> $GITHUB_ENV
 
     - name: Build Docker image with version tag
       run: |
-        docker build -t mikkelhv/4sembidservice:${{ env.VERSION }} -f ./bidServiceAPI/Dockerfile ./bidServiceAPI
+        docker build -t mikkelhv/4sembidingress:${{ env.VERSION }} -f ./bidIngressAPI/Dockerfile ./bidIngressAPI
 
     - name: Push Docker image to Docker Hub
       run: |
-        docker push mikkelhv/4sembidservice:${{ env.VERSION }}
+        docker push mikkelhv/4sembidingress:${{ env.VERSION }}
     
     - name: Tag og push docker image med latest versionering
       run: |
-        docker tag mikkelhv/4sembidservice:${{ env.VERSION }} mikkelhv/4sembidservice:latest
-        docker push mikkelhv/4sembidservice:latest
+        docker tag mikkelhv/4sembidingress:${{ env.VERSION }} mikkelhv/4sembidingress:latest
+        docker push mikkelhv/4sembidingress:latest
