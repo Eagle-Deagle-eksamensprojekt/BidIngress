@@ -3,6 +3,8 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using RabbitMQ.Client;
 using BidIngressAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Diagnostics;
 
 namespace BidIngressAPI.Controllers
 {
@@ -35,6 +37,20 @@ namespace BidIngressAPI.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpGet("version")]
+        public async Task<IActionResult> GetVersion()
+        {
+            var properties = new Dictionary<string, string>();
+
+            var ver = FileVersionInfo.GetVersionInfo(
+                typeof(Program).Assembly.Location).ProductVersion ?? "N/A";
+            properties.Add("version", ver);
+
+            return Ok(new {properties});
+        }
+
+        [Authorize]
         [HttpPost]
         public IActionResult RouteBid([FromBody] Bid bid)
         {
