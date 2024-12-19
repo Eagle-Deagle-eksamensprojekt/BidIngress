@@ -56,20 +56,20 @@ namespace BidIngressAPI.Controllers
         {
             _logger.LogInformation("Received bid: {@Bid}", bid);
 
-            if (bid == null || string.IsNullOrWhiteSpace(bid.ItemId))
+            if (bid == null || string.IsNullOrWhiteSpace(bid.ItemId)) // Check for missing ItemId
             {
                 _logger.LogWarning("Invalid bid received. Missing ItemId or bid details.");
                 return BadRequest("Invalid bid. Missing ItemId or bid details.");
             }
 
-            var queueName = $"{bid.ItemId}bid";
+            var queueName = $"{bid.ItemId}bid"; // Queue name is based on ItemId
 
             try
             {
                 _logger.LogInformation("Checking existence of queue {QueueName} for ItemId {ItemId}.", queueName, bid.ItemId);
-                _channel.QueueDeclarePassive(queueName);
+                _channel.QueueDeclarePassive(queueName); // Check if queue exists
             }
-            catch (RabbitMQ.Client.Exceptions.OperationInterruptedException ex)
+            catch (RabbitMQ.Client.Exceptions.OperationInterruptedException ex) 
             {
                 _logger.LogWarning(ex, "Queue {QueueName} for ItemId {ItemId} does not exist.", queueName, bid.ItemId);
                 return NotFound($"Queue for item {bid.ItemId} does not exist.");
@@ -87,7 +87,7 @@ namespace BidIngressAPI.Controllers
                 var body = Encoding.UTF8.GetBytes(message);
 
                 _logger.LogInformation("Publishing bid to queue {QueueName} for ItemId {ItemId}.", queueName, bid.ItemId);
-                _channel.BasicPublish(
+                _channel.BasicPublish( // Publish bid to queue
                     exchange: "",
                     routingKey: queueName,
                     basicProperties: null,
@@ -95,7 +95,7 @@ namespace BidIngressAPI.Controllers
                 );
 
                 _logger.LogInformation("Successfully routed bid for ItemId {ItemId} to queue {QueueName}.", bid.ItemId, queueName);
-                return Ok("Bid routed successfully.");
+                return Ok(new { message = "Bid routed successfully." });
             }
             catch (Exception ex)
             {
